@@ -1,6 +1,5 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # URL for connecting to the database ---> can be added to config / .env file at some point
 SQLITE_DATABASE_URL = 'sqlite:///./blog.db'
@@ -15,3 +14,19 @@ SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False,)
 # Used to register python classes as valid database tables, and track metadata
 # table classes inherit from Base, signalling to SQLalchemy ORM that these should be mapped as tables in the DB
 Base = declarative_base()
+
+# Yields an independent session / conneciton to db, and maintains state/ connection until request finished/ fails
+def get_db():       # Function to return a db
+    db = SessionLocal()
+    try:
+        yield db
+        print('Successfully connected to db')
+    except Exception as e:
+        print('Trouble connecting to database')
+        print(f'Error : {e}')
+    finally:
+        db.close()
+
+from . import schemas
+
+
