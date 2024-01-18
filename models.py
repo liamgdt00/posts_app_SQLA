@@ -1,4 +1,4 @@
-from pydantic import BaseModel, UUID4, Field
+from pydantic import BaseModel, UUID4, Field, EmailStr
 from sqlalchemy import Uuid
 from typing import Annotated
 from datetime import datetime
@@ -17,7 +17,7 @@ class ShowPost(PostCreate):
 
 class UserBase(BaseModel):
     username : str
-    email : str
+    email : EmailStr
     # username : Annotated[ str , Field(pattern = r'')]
 
 class UserShow(UserBase):
