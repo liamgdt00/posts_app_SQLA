@@ -1,14 +1,17 @@
 from pydantic import BaseModel, UUID4, Field, EmailStr
 from sqlalchemy import Uuid
-from typing import Annotated
+from typing import Annotated, Union, Optional
 from datetime import datetime
-class PostCreate(BaseModel):
+
+class PostBase(BaseModel):
                             # Model for the request body when CREATING or  UPDATING  a post
     title : str
     content : str
     published : bool | None = False
 
-class ShowPost(PostCreate):
+class PostCreate(PostBase):
+    pass
+class PostShow(PostCreate):
                             # Model for READING a post or returned structure after CREATING or UPDATING a post
     # post_id : int = Field(alias='id')
     created_at : datetime
@@ -29,3 +32,14 @@ class Profile(UserBase):
     first_name : str
     last_name : str
     account_no : int
+
+class UserLogin(BaseModel):
+    username_or_email : Union[str, EmailStr]
+    password : str
+
+class Token(BaseModel):
+    access_token : str
+    token_type : str
+
+class TokenData(BaseModel):
+    id: int | None = None

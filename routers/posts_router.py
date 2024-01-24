@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Response, status, HTTPException, Depends
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from .. import database, schemas, models
-from ..utilss import postsq, utils
+
+from .. import database, schemas, models, oauth2
+from ..utilss import postsq
 
 router = APIRouter(
     tags=['Posts'],
@@ -10,14 +12,14 @@ router = APIRouter(
 )
 
 # GET request to return all records in the Post table
-@router.get('/')# , response_model=list[models.ShowPost])
+@router.get('/' , response_model=list[models.PostShow])
 def get_all_posts(db : Session = Depends(database.get_db)):
     posts = db.query(schemas.Post).all()
     return posts
 
 
 # Get request to return a specfic record based on id
-@router.get('/{post_id}' ,name = 'Get post by id', response_model=models.ShowPost)
+@router.get('/{post_id}' ,name = 'Get post by id', response_model=models.PostShow)
 def get_post(post_id: int, db : Session = Depends(database.get_db)):
     post_query = postsq.get_post_query_by_id(post_id, db)
     return post_query.first()
@@ -25,9 +27,10 @@ def get_post(post_id: int, db : Session = Depends(database.get_db)):
 
 # POST request to create a new record of post in the Post table
 # uses PostCreate as request body structure, Depends returns a pydantic object
-@router.post('/' , status_code=status.HTTP_201_CREATED, response_model= models.ShowPost)
-def create_post(request : models.PostCreate, db :Session = Depends(database.get_db)):
-    return postsq.create_post(request, db)
+@router.post('/' , status_code=status.HTTP_201_CREATED, response_model= models.PostShow)
+def create_post(request : models.PostCreate, db :Session = Depends(database.get_db),
+                current_user : models.TokenData = Depends(oauth2.get_current_user_id)):
+    return postsq.create_post(request, db , current_user.id)
 
 
 @router.delete('/{post_id}' , status_code=status.HTTP_204_NO_CONTENT)
@@ -39,7 +42,7 @@ def delete_post(post_id : int , db : Session = Depends(database.get_db)):
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
     
-@router.put('/{post_id}' , status_code=status.HTTP_202_ACCEPTED, response_model=models.ShowPost)
+@router.put('/{post_id}' , status_code=status.HTTP_202_ACCEPTED, response_model=models.PostShow)
 def update_post(post_id : int, request : models.PostCreate, db : Session = Depends(database.get_db)):
     post_query = postsq.get_post_query_by_id(post_id , db)
     post = post_query.first()
@@ -51,7 +54,7 @@ def update_post(post_id : int, request : models.PostCreate, db : Session = Depen
     db.refresh(post)
     return post
 
-@router.get('/title/{title_pattern}')
+@router.get('/title/{title_pattern}', response_model=list[models.PostShow])
 def get_title_containig_pattern(title_pattern : str , db : Session = Depends(database.get_db)):
     titles_query = postsq.query_posts_containing_string(title_pattern, db)
     return titles_query.all()
