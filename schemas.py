@@ -1,8 +1,10 @@
-from .database import Base
 from sqlalchemy import Column, Integer, Uuid, String, Table, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
+
 import uuid
 from datetime import datetime
+
+from .database import Base
 
 class Post(Base):
     # ORM table structure for the posts table
@@ -18,7 +20,7 @@ class Post(Base):
     created_at = Column(String, default = datetime.now, nullable=False)
     owner_id = Column(Integer ,ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
 
-    owner = relationship('User', back_populates= 'posts')
+    owner_rel = relationship('User', back_populates= 'posts_rel')
     
 class User(Base):
 
@@ -29,5 +31,5 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(String, default = datetime.now, nullable=False)
 
-    posts = relationship('Post', back_populates='owner', cascade='all, delete-orphan')
+    posts_rel = relationship('Post', back_populates='owner_rel', cascade='all, delete-orphan')
 

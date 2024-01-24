@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Response, status, HTTPException, Depends
+
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+
 from .. import database, schemas, models
 from ..utilss import usersq, utils
 
@@ -10,6 +12,12 @@ router = APIRouter(
 
 @router.post('/users',   status_code=status.HTTP_201_CREATED, response_model=models.UserBase)
 def create_user(request : models.UserCreate, db : Session = Depends(database.get_db)):
+    '''
+    Create a user with all the following information:
+    - **username**: a unique username
+    - **email**:  a valid, unique email
+    - **password**: a secure password
+    '''
     request.password = utils.hash_password(request.password)
     new_user = schemas.User(**request.model_dump())
     try:
@@ -27,10 +35,6 @@ def create_user(request : models.UserCreate, db : Session = Depends(database.get
 def get_user(user_id : int , db : Session = Depends(database.get_db)):
     user_query = usersq.query_user_by_id(user_id, db )
     return user_query.first()
-    # user = db.query(schemas.User).filter(schemas.User.user_id == user_id).first()
-    # if not user:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = f'User with user_id : {user_id} not found')
-    # return user
 
 
 @router.get('/users/', name='Get User by email or username')# , response_model = models.UserBase
@@ -54,10 +58,9 @@ def get_all_users(db : Session = Depends(database.get_db)):
 @router.delete('/users/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id : int, db : Session = Depends(database.get_db)):
     user_query = usersq.query_user_by_id(user_id , db)
-    print(user_query)
     table_name = user_query.first().__tablename__
-    num_rows = user_query.delete(synchronize_session=False)
-    print(f'Deleted {num_rows} rows from {table_name.upper()} table')
+    num_user_rows = user_query.delete(synchronize_session=False)
+    print(f'Deleted {num_user_rows} rows from {table_name.upper()} table')
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

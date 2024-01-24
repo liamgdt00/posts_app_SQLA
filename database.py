@@ -6,7 +6,7 @@ SQLITE_DATABASE_URL = 'sqlite:///./blog.db'
 
 # engine instance for db connection
 engine = create_engine(SQLITE_DATABASE_URL, connect_args={
-                       "check_same_thread": False})
+                       "check_same_thread": False},echo=True)
 
 # SessionLocal class to be imported for creating connecitons to db
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
@@ -24,8 +24,8 @@ def get_db():       # Function to return a db
         yield db
         print('Successfully connected to db')
     except Exception as e:
-        print('Trouble connecting to database')
         print(f'Error : {e}')
+        print('Trouble connecting to database')
     finally:
         db.close()
 
