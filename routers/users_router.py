@@ -13,7 +13,7 @@ router = APIRouter(
 @router.post('/users',   status_code=status.HTTP_201_CREATED, response_model=models.UserBase)
 def create_user(request : models.UserCreate, db : Session = Depends(database.get_db)):
     '''
-    Create a user with all the following information:
+    ##Create a user with all the following information:
     - **username**: a unique username
     - **email**:  a valid, unique email
     - **password**: a secure password
