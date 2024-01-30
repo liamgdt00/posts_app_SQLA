@@ -4,6 +4,10 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 # URL for connecting to the database ---> can be added to config / .env file at some point
 SQLITE_DATABASE_URL = 'sqlite:///./blog.db'
 
+# dialect+driver://username:password@host:port/database
+# without dialect = postgresql://user:password@postgresserver/db
+# with dialect = postgresql+psycopg2://scott:tiger@localhost:5432/mydatabase
+
 # engine instance for db connection
 engine = create_engine(SQLITE_DATABASE_URL, connect_args={
                        "check_same_thread": False},echo=True)
