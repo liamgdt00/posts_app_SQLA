@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
+from .config import settings
 
 # URL for connecting to the database ---> can be added to config / .env file at some point
-SQLITE_DATABASE_URL = 'sqlite:///./blog.db'
+SQLITE_DATABASE_URL = f'{settings.database_provider}:///./{settings.database_name}'
 
 # dialect+driver://username:password@host:port/database
 # without dialect = postgresql://user:password@postgresserver/db

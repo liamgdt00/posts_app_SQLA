@@ -9,6 +9,7 @@ from typing import Annotated
 
 from . import schemas , models, database
 from .utilss import usersq
+from .config import settings
 from datetime import datetime, timedelta, timezone
 
 
@@ -18,9 +19,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 # ALGORITHM -> hashing algorithm for token
 # EXPIRATION TIME -> default expiration time for token
 
-SECRET_KEY = '043d25e094faz6ca2556c818166b7a9ll63b93f7099f60f4caa6cf6321cdc83e7'
-ALGORITHM = 'HS256'
-TOKEN_EXPIRES_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+TOKEN_EXPIRES_MINUTES = settings.access_token_expires_minutes
 
 def create_access_token(data : dict):
     # copy the data to encode inorder to not modify the mutable dictionary
